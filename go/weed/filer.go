@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/chrislusf/weed-fs/go/glog"
-	"github.com/chrislusf/weed-fs/go/util"
-	"github.com/chrislusf/weed-fs/go/weed/weed_server"
+	"github.com/mcqueenorama/weed-fs/go/glog"
+	"github.com/mcqueenorama/weed-fs/go/util"
+	"github.com/mcqueenorama/weed-fs/go/weed/weed_server"
 )
 
 var (
@@ -26,6 +26,7 @@ type FilerOptions struct {
 	cassandra_keyspace      *string
 	redis_server            *string
 	redis_database          *int
+	ssdb_server            *string
 }
 
 func init() {
@@ -40,6 +41,7 @@ func init() {
 	f.cassandra_keyspace = cmdFiler.Flag.String("cassandra.keyspace", "seaweed", "keyspace of the cassandra server")
 	f.redis_server = cmdFiler.Flag.String("redis.server", "", "host:port of the redis server, e.g., 127.0.0.1:6379")
 	f.redis_database = cmdFiler.Flag.Int("redis.database", 0, "the database on the redis server")
+	f.ssdb_server = cmdFiler.Flag.String("ssdb.server", "", "host:port of the ssdb server, e.g., 127.0.0.1:8888")
 }
 
 var cmdFiler = &Command{
@@ -74,7 +76,8 @@ func runFiler(cmd *Command, args []string) bool {
 	_, nfs_err := weed_server.NewFilerServer(r, *f.port, *f.master, *f.dir, *f.collection,
 		*f.defaultReplicaPlacement, *f.redirectOnRead,
 		*f.cassandra_server, *f.cassandra_keyspace,
-		*f.redis_server, *f.redis_database,
+		*f.redis_server, *f.redis_database, 
+		*f.ssdb_server,
 	)
 	if nfs_err != nil {
 		glog.Fatalf(nfs_err.Error())

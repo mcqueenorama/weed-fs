@@ -3,7 +3,7 @@ package cassandra_store
 import (
 	"fmt"
 
-	"github.com/chrislusf/weed-fs/go/glog"
+	"github.com/mcqueenorama/weed-fs/go/glog"
 
 	"github.com/gocql/gocql"
 )

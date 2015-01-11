@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chrislusf/weed-fs/go/glog"
-	"github.com/chrislusf/weed-fs/go/util"
-	"github.com/chrislusf/weed-fs/go/weed/weed_server"
+	"github.com/mcqueenorama/weed-fs/go/glog"
+	"github.com/mcqueenorama/weed-fs/go/util"
+	"github.com/mcqueenorama/weed-fs/go/weed/weed_server"
 	"github.com/gorilla/mux"
 )
 
@@ -81,10 +81,11 @@ func init() {
 	filerOptions.dir = cmdServer.Flag.String("filer.dir", "", "directory to store meta data, default to a 'filer' sub directory of what -mdir is specified")
 	filerOptions.defaultReplicaPlacement = cmdServer.Flag.String("filer.defaultReplicaPlacement", "", "Default replication type if not specified during runtime.")
 	filerOptions.redirectOnRead = cmdServer.Flag.Bool("filer.redirectOnRead", false, "whether proxy or redirect to volume server during file GET request")
-	filerOptions.cassandra_server = cmdFiler.Flag.String("filer.cassandra.server", "", "host[:port] of the cassandra server")
-	filerOptions.cassandra_keyspace = cmdFiler.Flag.String("filer.cassandra.keyspace", "seaweed", "keyspace of the cassandra server")
+	filerOptions.cassandra_server = cmdServer.Flag.String("filer.cassandra.server", "", "host[:port] of the cassandra server")
+	filerOptions.cassandra_keyspace = cmdServer.Flag.String("filer.cassandra.keyspace", "seaweed", "keyspace of the cassandra server")
 	filerOptions.redis_server = cmdServer.Flag.String("filer.redis.server", "", "host:port of the redis server, e.g., 127.0.0.1:6379")
-	filerOptions.redis_database = cmdFiler.Flag.Int("filer.redis.database", 0, "the database on the redis server")
+	filerOptions.redis_database = cmdServer.Flag.Int("filer.redis.database", 0, "the database on the redis server")
+	filerOptions.ssdb_server = cmdServer.Flag.String("filer.ssdb.server", "", "host:port of the ssdb server, e.g., 127.0.0.1:8888")
 
 }
 
@@ -163,8 +164,9 @@ func runServer(cmd *Command, args []string) bool {
 			r := http.NewServeMux()
 			_, nfs_err := weed_server.NewFilerServer(r, *filerOptions.port, *filerOptions.master, *filerOptions.dir, *filerOptions.collection,
 				*filerOptions.defaultReplicaPlacement, *filerOptions.redirectOnRead,
-				"", "",
-				"", 0,
+				*filerOptions.cassandra_server, *filerOptions.cassandra_keyspace,
+				*filerOptions.redis_server, *filerOptions.redis_database, 
+				*filerOptions.ssdb_server,
 			)
 			if nfs_err != nil {
 				glog.Fatalf(nfs_err.Error())
